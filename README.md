@@ -21,9 +21,4 @@ This repository provides a fully automated toolkit to help students evaluate and
    ```bash
    streamlit run fairness_app.py
    ```
-
-## Dataset Requirements
-
-Place the datasets in the appropriate paths before running:
-- COMPAS: `compas-scores-two-years.csv`
-- StereoSet: `bias-bench/stereoset/stereoset_dev.jsonl`
+Alternatively, access the deployed app: [https://fairness-in-ai-activity.streamlit.app/](https://fairness-in-ai-activity.streamlit.app/)

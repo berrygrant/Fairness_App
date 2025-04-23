@@ -16,9 +16,9 @@ if dataset_name == 'compas':
     outcome_var = 'two_year_recid'
     sensitive_vars = ['age_cat', 'sex', 'race']
 elif dataset_name == 'stereoset':
-    data_path = 'bias-bench/stereoset/stereoset_dev.jsonl'
-    outcome_var = 'ss'  # stereotypical score, can switch to 'lms' or 'icat' as needed
-    sensitive_vars = ['bias_type']  # this will be 'gender', 'race', etc.
+    data_path = 'stereoset_dev.json'
+    outcome_var = 'label'
+    sensitive_vars = ['bias_type']
 else:
     raise ValueError("Unknown dataset")
 
@@ -32,19 +32,25 @@ def load_compas(path):
     return df
 
 def load_stereoset(path):
-    data = []
-    with open(path, 'r') as f:
-        for line in f:
-            item = json.loads(line)
-            if 'bias_type' in item and 'ss' in item:
-                record = {
-                    'bias_type': item['bias_type'],
-                    'ss': item.get('ss', np.nan),
-                    'lms': item.get('lms', np.nan),
-                    'icat': item.get('icat', np.nan)
-                }
-                data.append(record)
-    return pd.DataFrame(data)
+    with open(path, "r") as f:
+        data_json = json.load(f)
+
+    records = []
+    for item in data_json["data"]["intersentence"]:
+        bias_type = item["bias_type"]
+        target = item["target"]
+        for s in item["sentences"]:
+            gold_label = s.get("gold_label", "").strip().lower()
+            if gold_label in ["stereotype", "anti-stereotype"]:
+                label = 1 if gold_label == "stereotype" else 0
+                records.append({
+                    "target": target,
+                    "bias_type": bias_type,
+                    "sentence": s["sentence"],
+                    "gold_label": gold_label,
+                    "label": label
+                })
+    return pd.DataFrame(records)
 
 if dataset_name == 'compas':
     df = load_compas(data_path)
