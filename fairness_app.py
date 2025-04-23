@@ -12,6 +12,29 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.svm import SVC
 from sklearn.neighbors import KNeighborsClassifier
 
+# Caching
+@st.cache_resource
+def train_cached_model(model_name, X_train_scaled, y_train, weights=None, **params):
+    if model_name == "Logistic Regression":
+        model = LogisticRegression(C=params["C"], max_iter=params["max_iter"])
+    elif model_name == "Random Forest":
+        model = RandomForestClassifier(
+            n_estimators=params["n_estimators"],
+            max_depth=None if params["max_depth"] == 0 else params["max_depth"],
+            random_state=42,
+        )
+    elif model_name == "Support Vector Machine":
+        model = SVC(C=params["C"], kernel=params["kernel"], probability=True)
+    elif model_name == "K-Nearest Neighbors":
+        model = KNeighborsClassifier(n_neighbors=params["n_neighbors"])
+
+    if model_name in ["Logistic Regression", "Random Forest"] and weights is not None:
+        model.fit(X_train_scaled, y_train, sample_weight=weights.loc[y_train.index])
+    else:
+        model.fit(X_train_scaled, y_train)
+
+    return model
+
 st.set_page_config(page_title="Fairness in AI Toolkit", layout="wide")
 st.title("🔍 Fairness in AI: Automated Assignment Toolkit")
 
@@ -29,7 +52,7 @@ elif dataset_name == "stereoset":
     sensitive_var = "bias_type"
     outcome_var = "label"
 
-@st.cache_data()
+@st.cache_data
 def load_data(dataset_name, path):
     if dataset_name == "compas":
         df = pd.read_csv(path)
@@ -219,22 +242,23 @@ if run_analysis:
     X_train_scaled = scaler.fit_transform(X_train)
     X_test_scaled = scaler.transform(X_test)
 
-    # Model selection
-    if model_name == "Logistic Regression":
-        model = LogisticRegression(C=C, max_iter=max_iter)
+# Model selection
+    param_dict = {
+        "C": C,
+        "max_iter": max_iter if model_name == "Logistic Regression" else None,
+        "n_estimators": n_estimators if model_name == "Random Forest" else None,
+        "max_depth": max_depth if model_name == "Random Forest" else None,
+        "kernel": kernel if model_name == "Support Vector Machine" else None,
+        "n_neighbors": n_neighbors if model_name == "K-Nearest Neighbors" else None,
+    }
 
-    elif model_name == "Random Forest":
-        model = RandomForestClassifier(
-            n_estimators=n_estimators,
-            max_depth=None if max_depth == 0 else max_depth,
-            random_state=42
-        )
-
-    elif model_name == "Support Vector Machine":
-        model = SVC(C=C, kernel=kernel, probability=True)
-
-    elif model_name == "K-Nearest Neighbors":
-        model = KNeighborsClassifier(n_neighbors=n_neighbors)
+    model = train_cached_model(
+        model_name=model_name,
+        X_train_scaled=X_train_scaled,
+        y_train=y_train,
+        weights=weights,
+        **param_dict
+    )
 
 
 # Fit model with or without sample weights depending on model type
