@@ -12,13 +12,20 @@ This repository provides a fully automated toolkit to help students evaluate and
 
 ## How to Run
 
-1. Install requirements:  
+1. Clone or fork the repository  
+   ```git 
+   git clone https://github.com/berrygrant/Fairness_App.git     
+   ``` 
+
+2. Install requirements (preferably in a [virtual environment](https://docs.python.org/3/library/venv.html)):  
    ```bash
    pip install -r requirements.txt
    ```
 
-2. Launch the Streamlit app:  
+3. Launch the Streamlit app on your local machine:  
    ```bash
    streamlit run fairness_app.py
    ```
-Alternatively, access the deployed app: [https://fairness-in-ai-activity.streamlit.app/](https://fairness-in-ai-activity.streamlit.app/)
+
+Alternatively, you can access the deployed app: [https://fairness-in-ai-activity.streamlit.app/](https://fairness-in-ai-activity.streamlit.app/)  
+**Note: Streamlit's free tier has limited memory resources, so the app may crash. I've set a cron job that will reboot the app every morning, but I will not reboot the app on an ad-hoc basis.**

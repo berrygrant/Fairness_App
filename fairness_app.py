@@ -29,8 +29,8 @@ elif dataset_name == "stereoset":
     sensitive_var = "bias_type"
     outcome_var = "label"
 
-
-def load_data():
+@st.cache_data()
+def load_data(dataset_name, path):
     if dataset_name == "compas":
         df = pd.read_csv(path)
         df = df[(df['days_b_screening_arrest'] <= 30) & (df['days_b_screening_arrest'] >= -30)]
@@ -40,7 +40,7 @@ def load_data():
         return df
     elif dataset_name == "stereoset":
         combined = []
-        for fname in ["./data/stereoset_dev.json", "./data/stereoset_test.json"]:
+        for fname in path:
             with open(fname, "r") as f:
                 data_json = json.load(f)
             for item in data_json["data"]["intersentence"]:
@@ -57,7 +57,7 @@ def load_data():
                             "gold_label": gold_label,
                             "label": label
                         })
-    return pd.DataFrame(combined)
+        return pd.DataFrame(combined)
 
 # ==== Load and Show Data ====
 
@@ -89,7 +89,7 @@ intervention_descriptions = {
 st.sidebar.markdown("### 📖 Intervention Description")
 st.sidebar.info(intervention_descriptions.get(intervention, "No description available."))
 
-df = load_data()
+df = load_data(dataset_name, path)
 available_features = [col for col in df.columns if col not in [outcome_var, sensitive_var]]
 
 if st.checkbox("Preview raw data"):
