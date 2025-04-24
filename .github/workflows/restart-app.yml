@@ -37,7 +37,7 @@ jobs:
 
       - name: Pull latest changes
         run: |
-          git pull --rebase origin main
+          git pull --rebase --autostash origin main
 
       - name: Push changes
         run: |
