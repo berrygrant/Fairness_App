@@ -245,7 +245,7 @@ if run_analysis:
 
 # Model selection
     param_dict = {
-        "C": C,
+        "C": C if model_name=="Logistic Regression" or model_name == "Support Vector Machine" else None,
         "max_iter": max_iter if model_name == "Logistic Regression" else None,
         "n_estimators": n_estimators if model_name == "Random Forest" else None,
         "max_depth": max_depth if model_name == "Random Forest" else None,
