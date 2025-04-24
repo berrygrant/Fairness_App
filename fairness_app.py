@@ -1,4 +1,5 @@
 import streamlit as st
+from streamlit_autorefresh import st_autorefresh
 import pandas as pd
 import numpy as np
 import json
@@ -11,6 +12,9 @@ from collections import Counter
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.svm import SVC
 from sklearn.neighbors import KNeighborsClassifier
+
+# Refresh every 24 hours (86,400,000 milliseconds)
+st_autorefresh(interval=86400000, key="daily_refresh")
 
 # Caching
 @st.cache_resource
