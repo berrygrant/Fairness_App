@@ -13,9 +13,6 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.svm import SVC
 from sklearn.neighbors import KNeighborsClassifier
 
-# Refresh every 24 hours (86,400,000 milliseconds)
-st_autorefresh(interval=86400000, key="daily_refresh")
-
 # Caching
 @st.cache_resource
 def train_cached_model(model_name, X_train_scaled, y_train, weights=None, **params):
@@ -312,3 +309,6 @@ if run_analysis:
     st.dataframe(fairness_df)
 
     st.download_button("Download Fairness Summary", data=fairness_df.to_csv(index=False), file_name="fairness_metrics.csv")
+
+# Refresh every 24 hours (86,400,000 milliseconds)
+st_autorefresh(interval=86400000, key="daily_refresh")
